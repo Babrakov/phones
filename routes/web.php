@@ -16,3 +16,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+
+//Route::get('admin/register', function () {
+//    return redirect('/');
+//})->name('backpack.auth.register');
