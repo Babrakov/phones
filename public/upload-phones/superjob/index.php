@@ -62,7 +62,7 @@ $date = '2017-05-14';
 //$source = 'SJ_Ч6_880к _РФ (Без МСК и СПБ)_(Vers 2.0).xlsx';
 
 $file = 'file.csv';
-$source = '5';
+$source = '6';
 
 $handle = fopen($file,'rt');
 $str = fgets($handle); // пропускаем 1-ю строку
