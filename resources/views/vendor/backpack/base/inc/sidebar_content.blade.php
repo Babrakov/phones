@@ -11,4 +11,17 @@
     </ul>
 </li>
 
-<li class='nav-item'><a class='nav-link' href='{{ backpack_url('tag') }}'><i class='nav-icon la la-question'></i> Tags</a></li>
+{{--<li class='nav-item'><a class='nav-link' href='{{ backpack_url('tag') }}'><i class='nav-icon la la-question'></i> Tags</a></li>--}}
+
+<li class='nav-item'><a class='nav-link' href='{{ backpack_url('phone') }}'><i class='nav-icon la la-phone'></i> Телефоны</a></li>
+
+
+<!-- Users, Roles Permissions -->
+<li class="nav-item nav-dropdown">
+    <a class="nav-link nav-dropdown-toggle" href="#"><i class="nav-icon la la-folder-open"></i> Справочники</a>
+    <ul class="nav-dropdown-items">
+        <li class='nav-item'><a class='nav-link' href='{{ backpack_url('sex') }}'><i class='nav-icon la la-venus-mars'></i> Пол</a></li>
+        <li class='nav-item'><a class='nav-link' href='{{ backpack_url('source') }}'><i class='nav-icon la la-map-marker'></i> Источники</a></li>
+    </ul>
+</li>
+
