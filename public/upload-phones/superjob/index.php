@@ -48,6 +48,7 @@ ini_set('max_execution_time', 0);
 //exit;
 
 $link = mysqli_connect('localhost','phones_user','WG3uTGA(ax3KkBHPZLu3','phones');
+mysqli_set_charset($link, "utf8");
 
 $date = '2017-05-14';
 
