@@ -57,8 +57,11 @@ $date = '2017-05-14';
 //$file = 'file1.csv';
 //$source = 'SJ_Ч5_900к _РФ (Без МСК и СПБ)_(Vers 2.0).xlsx';
 
-$file = 'file2.csv';
-$source = 'SJ_Ч6_880к _РФ (Без МСК и СПБ)_(Vers 2.0).xlsx';
+//$file = 'file2.csv';
+//$source = 'SJ_Ч6_880к _РФ (Без МСК и СПБ)_(Vers 2.0).xlsx';
+
+$file = 'file.csv';
+$source = '5';
 
 $handle = fopen($file,'rt');
 $str = fgets($handle); // пропускаем 1-ю строку
@@ -111,7 +114,7 @@ while (!feof($handle)) {
     if ($phone && $ifNotExist) {
         if ($counter === 0) {
             $query = "INSERT INTO phones
-                (vc_phone,vc_fio,dt_rec,vc_source,sex_id,dt_born,vc_email,vc_city,vc_region,tx_rem,bn_hash)
+                (vc_phone,vc_fio,dt_rec,source_id,sex_id,dt_born,vc_email,vc_city,vc_region,tx_rem,bn_hash)
                 VALUES
                 ('$phone','$name','$date','$source',$sex,'$born','$email','$city','$region','$rem',UNHEX('$hash'))";
         } else {
