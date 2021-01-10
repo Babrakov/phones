@@ -18,7 +18,7 @@ class PhoneCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation {
         search as searchFromTrait;
     }
-    use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation { store as traitStore; }
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation { update as traitUpdate; }
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
@@ -475,10 +475,44 @@ class PhoneCrudController extends CrudController
             .$this->crud->getRequest()->vc_email
             .$this->crud->getRequest()->vc_link
         ));
+        $id = $this->crud->getRequest()->id;
+        $exist = Phone::where('id','<>',$id)->where('bn_hash',$hash)->count();
+        if (!$exist) {
+            $this->crud->getRequest()->request->add(['bn_hash' => $hash]);
+            $response = $this->traitUpdate();
+            // do something after save
+            return $response;
+        } else {
+            return redirect()->back()->withErrors('Запись уже существует.')->withInput();
+        }
 
-        $this->crud->getRequest()->request->add(['bn_hash'=> $hash]);
-        $response = $this->traitUpdate();
-        // do something after save
-        return $response;
+    }
+
+    public function store()
+    {
+        // do something before validation, before save, before everything; for example:
+        // $this->crud->addField(['type' => 'hidden', 'name' => 'author_id']);
+        // $this->crud->removeField('password_confirmation');
+
+        $hash = hex2bin(md5($this->crud->getRequest()->vc_phone
+            .$this->crud->getRequest()->vc_fio
+            .$this->crud->getRequest()->dt_born
+            .$this->crud->getRequest()->sex_id
+            .$this->crud->getRequest()->vc_region
+            .$this->crud->getRequest()->vc_city
+            .$this->crud->getRequest()->tx_location
+            .$this->crud->getRequest()->vc_email
+            .$this->crud->getRequest()->vc_link
+        ));
+
+        $exist = Phone::where('bn_hash',$hash)->count();
+        if (!$exist) {
+            $this->crud->getRequest()->request->add(['bn_hash' => $hash]);
+            $response = $this->traitStore();
+            // do something after save
+            return $response;
+        } else {
+            return redirect()->back()->withErrors('Запись уже существует.')->withInput();
+        }
     }
 }
