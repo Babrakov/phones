@@ -28,7 +28,7 @@ class SexCrudController extends CrudController
     {
         CRUD::setModel(\App\Models\Sex::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/sex');
-        CRUD::setEntityNameStrings('пол', 'пол');
+        CRUD::setEntityNameStrings('пол', 'полы');
     }
 
     /**

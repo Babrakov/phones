@@ -27,7 +27,7 @@
 {{--                    @auth--}}
                     @if (backpack_user())
 {{--                        <a href="{{ url('/admin') }}" class="text-sm text-gray-700 underline">Начать работу</a>--}}
-                        <a href="{{ url('/admin') }}" class="text-sm text-gray-700">Начать работу</a>
+                        <a href="{{ url('/admin/phone') }}" class="text-sm text-gray-700">Начать работу</a>
                     @else
 {{--                        <a href="{{ route('backpack.auth.login') }}" class="text-sm text-gray-700 underline">Войти</a>--}}
                         <a href="{{ route('backpack.auth.login') }}" class="text-sm text-gray-700">Войти</a>
