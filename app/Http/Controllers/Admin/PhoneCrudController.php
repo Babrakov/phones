@@ -447,6 +447,6 @@ class PhoneCrudController extends CrudController
     {
         $req = Phone::where('vc_phone',$phone)->get()->toArray();
         unset($req[0]['bn_hash']);
-        dd(json_encode($req));
+        echo json_encode($req);
     }
 }
