@@ -21,3 +21,7 @@ Route::get('/', function () {
 //Route::get('admin/register', function () {
 //    return redirect('/');
 //})->name('backpack.auth.register');
+
+Route::get('/check/{phone}', 'App\Http\Controllers\Admin\PhoneCrudController@check')->name('check');
+
+

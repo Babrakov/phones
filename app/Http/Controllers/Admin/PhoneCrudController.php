@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\PhoneRequest;
+use App\Models\Phone;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Illuminate\Support\Facades\DB;
@@ -440,5 +441,12 @@ class PhoneCrudController extends CrudController
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
+    }
+
+    public function check($phone)
+    {
+        $req = Phone::where('vc_phone',$phone)->get()->toArray();
+        unset($req[0]['bn_hash']);
+        dd(json_encode($req));
     }
 }
