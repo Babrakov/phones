@@ -19,7 +19,7 @@ class PhoneCrudController extends CrudController
         search as searchFromTrait;
     }
     use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation { update as traitUpdate; }
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
 
@@ -429,6 +429,11 @@ class PhoneCrudController extends CrudController
             'type' => 'textarea',
             'label' => "Примечание"
         ]);
+        $this->crud->addField([
+            'name' => 'bn_hash',
+            'type' => 'hidden',
+            'label' => "Хэш"
+        ]);
 
     }
 
@@ -446,7 +451,34 @@ class PhoneCrudController extends CrudController
     public function check($phone)
     {
         $req = Phone::where('vc_phone',$phone)->get()->toArray();
-//        unset($req[0]['bn_hash']);
+//dd($req);
+        for($i=0;$i<count($req);$i++) {
+            unset($req[$i]['bn_hash']);
+        }
+//        dd($req);
         echo json_encode($req);
+    }
+
+    public function update()
+    {
+        // do something before validation, before save, before everything; for example:
+        // $this->crud->addField(['type' => 'hidden', 'name' => 'author_id']);
+        // $this->crud->removeField('password_confirmation');
+
+        $hash = hex2bin(md5($this->crud->getRequest()->vc_phone
+            .$this->crud->getRequest()->vc_fio
+            .$this->crud->getRequest()->dt_born
+            .$this->crud->getRequest()->sex_id
+            .$this->crud->getRequest()->vc_region
+            .$this->crud->getRequest()->vc_city
+            .$this->crud->getRequest()->tx_location
+            .$this->crud->getRequest()->vc_email
+            .$this->crud->getRequest()->vc_link
+        ));
+
+        $this->crud->getRequest()->request->add(['bn_hash'=> $hash]);
+        $response = $this->traitUpdate();
+        // do something after save
+        return $response;
     }
 }
