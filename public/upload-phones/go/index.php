@@ -1,5 +1,9 @@
 <?php
-//echo 'test'.PHP_E;exit;
+//$undoFile = 'undo.sql';
+//$undoHandle = fopen($undoFile,'w+');
+//fwrite($undoHandle,'swssss');
+//fclose($undoHandle);
+//echo 'test'.PHP_EOL;exit;
 ini_set('max_execution_time', 0);
 
 //Считываем текущее время
@@ -14,25 +18,20 @@ $startTime = $mtime;
 $link = mysqli_connect('localhost','phones_user','WG3uTGA(ax3KkBHPZLu3','phones');
 mysqli_set_charset($link, "utf8");
 
-$date = '2017-05-14';
-
-//$file = 'file0.csv';
-//$source = 'SJ_Ч4_900к _РФ (Без МСК и СПБ)_(Vers 2.0).xlsx';
-
-//$file = 'file1.csv';
-//$source = 'SJ_Ч5_900к _РФ (Без МСК и СПБ)_(Vers 2.0).xlsx';
-
-//$file = 'file2.csv';
-//$source = 'SJ_Ч6_880к _РФ (Без МСК и СПБ)_(Vers 2.0).xlsx';
-
 $undoFile = 'undo.sql';
 $undoHandle = fopen($undoFile,'w+');
+$query = "SELECT max(id) FROM phones";
+$result = mysqli_query($link, $query);
+$row = mysqli_fetch_row($result);
+$max = $row[0]+1;
+fwrite($undoHandle,"ALTER TABLE phones AUTO_INCREMENT=$max;\n");
 
+$date = '2020-12-25';
 
+$source = '8';
 $file = 'file.csv';
-$source = '6';
-
 $handle = fopen($file,'rt');
+
 $str = fgets($handle); // пропускаем 1-ю строку
 $counter = 0; // счетчик для буфера запросов
 $i = 0;
@@ -43,26 +42,28 @@ while (!feof($handle)) {
 //    }
     $str = trim(fgets($handle)); // берем строку из файла
     $str = str_replace("'",'',$str);
-    $arr = explode("\t",$str);
-    if (count($arr) < 10) {
+//    $arr = explode("\t",$str);
+    $arr = explode(";",$str);
+    if (count($arr) < 6) {
         continue;
     }
 
-    $name = $arr[1];
-//    $phone = (int) filter_var($arr[1], FILTER_SANITIZE_NUMBER_INT);
-//    $phone = filter_var($arr[1], FILTER_SANITIZE_NUMBER_INT);
-//    echo validatePhone($phone).' :: '.$arr[1].'<br>';
-    $phone = validatePhone(preg_replace('/[^0-9]/', '', $arr[5]));
-    $sex = getSex($arr[2]);
+    $phone = validatePhone(preg_replace('/[^0-9]/', '', $arr[0]));
+    $name = $arr[2] . ' ' . $arr[1];
+//    $sex = getSex($arr[2]);
+    $sex = 'null';
     $born = getDtBorn($arr[3]);
-    $email = $arr[9];
-    $city = $arr[10];
-    $region = $arr[7];
-    if ($arr[4]) {
-        $rem = 'Желаемая зарплата: '.$arr[4];
-    } else {
-        $rem = '';
-    }
+//    $email = $arr[9];
+    $email = '';
+    $city = $arr[4];
+//    $region = $arr[7];
+    $region = '';
+//    if ($arr[4]) {
+//        $rem = 'Желаемая зарплата: '.$arr[4];
+//    } else {
+//        $rem = '';
+//    }
+    $rem = '';
     $location = '';
     $url = '';
 
@@ -95,8 +96,7 @@ while (!feof($handle)) {
             $result = mysqli_query($link, $query);
             $first = mysqli_insert_id($link);
             $last = $first + mysqli_affected_rows($link) - 1;
-            fwrite($undoHandle,"DELETE FROM phones WHERE id $first AND $last;\n");
-//            echo $result;
+            fwrite($undoHandle,"DELETE FROM phones WHERE id BETWEEN $first AND $last;\n");
             $counter = 0;
         }
     }
@@ -105,7 +105,7 @@ if ($counter) {
     $result = mysqli_query($link, $query);
     $first = mysqli_insert_id($link);
     $last = $first + mysqli_affected_rows($link) - 1;
-    fwrite($undoHandle,"DELETE FROM phones WHERE id $first AND $last;\n");
+    fwrite($undoHandle,"DELETE FROM phones WHERE id BETWEEN $first AND $last;\n");
     $counter = 0;
 }
 
