@@ -5,7 +5,7 @@ ini_set('max_execution_time', 0);
 $link = mysqli_connect('localhost', 'phones_user', 'WG3uTGA(ax3KkBHPZLu3', 'phones');
 mysqli_set_charset($link, "utf8");
 
-$query = "SELECT id, vc_region FROM phones WHERE region_id IS NULL AND vc_region IS NOT NULL";
+$query = "SELECT id, vc_region FROM phones WHERE region_id IS NULL AND (vc_region IS NOT NULL AND vc_region<>'')";
 //$query = "SELECT id, vc_region FROM phones WHERE region_id IS NULL AND vc_region IS NOT NULL LIMIT 1000";
 $result = mysqli_query($link,$query);
 
@@ -14,6 +14,7 @@ while ($row = mysqli_fetch_assoc($result)) {
 
         $id = $row['id'];
         $region = $row['vc_region'];
+        $region = str_replace('г. Санкт - Петербург и Ленинградская обл.','Тюменская',$region);
         $region = str_replace('г. Тюмень  |  Тюменская обл.','Тюменская',$region);
         $region = str_replace('г. Севастополь и Республика Крым','Республика Крым',$region);
         $region = str_replace('г. Норильск  |  Красноярский край','Красноярский',$region);
