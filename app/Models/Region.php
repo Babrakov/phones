@@ -4,12 +4,10 @@ namespace App\Models;
 
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Model;
-//use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Phone extends Model
+class Region extends Model
 {
     use CrudTrait;
-//    use SoftDeletes;
 
     /*
     |--------------------------------------------------------------------------
@@ -17,7 +15,7 @@ class Phone extends Model
     |--------------------------------------------------------------------------
     */
 
-    protected $table = 'phones';
+    protected $table = 'regions';
     // protected $primaryKey = 'id';
     // public $timestamps = false;
     protected $guarded = ['id'];
@@ -30,21 +28,6 @@ class Phone extends Model
     | FUNCTIONS
     |--------------------------------------------------------------------------
     */
-
-    public function sex()
-    {
-        return $this->belongsTo('App\Models\Sex', 'sex_id');
-    }
-
-    public function source()
-    {
-        return $this->belongsTo('App\Models\Source', 'source_id');
-    }
-
-    public function region()
-    {
-        return $this->belongsTo('App\Models\Region', 'region_id');
-    }
 
     /*
     |--------------------------------------------------------------------------

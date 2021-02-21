@@ -18,4 +18,5 @@ Route::group([
     Route::crud('sex', 'SexCrudController');
     Route::crud('phone', 'PhoneCrudController');
     Route::crud('source', 'SourceCrudController');
+    Route::crud('region', 'RegionCrudController');
 }); // this should be the absolute last line of this file

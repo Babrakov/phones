@@ -275,6 +275,13 @@ class PhoneCrudController extends CrudController
             'label' => "Регион"
         ]);
         $this->crud->addColumn([
+            'name' => 'region_id',
+            'type' => 'select',
+            'label' => "Регион",
+            'entity'    => 'region', // the method that defines the relationship in your Model
+            'attribute' => 'vc_name', // foreign key attribute that is shown to user
+        ]);
+        $this->crud->addColumn([
             'name' => 'vc_city',
             'type' => 'text',
             'label' => "Город"
@@ -381,6 +388,13 @@ class PhoneCrudController extends CrudController
             'name' => 'vc_region',
             'type' => 'text',
             'label' => "Регион"
+        ]);
+        $this->crud->addField([
+            'name' => 'region_id',
+            'type' => 'select2',
+            'label' => "Регион",
+            'entity'    => 'region', // the method that defines the relationship in your Model
+            'attribute' => 'vc_name', // foreign key attribute that is shown to user
         ]);
         $this->crud->addField([
             'name' => 'vc_city',
