@@ -492,7 +492,7 @@ class PhoneCrudController extends CrudController
 
     public function check($phone)
     {
-        $req = Phone::where('vc_phone',$phone)->get()->toArray();
+        $req = Phone::with('region')->with('town')->where('vc_phone',$phone)->get()->toArray();
 //dd($req);
         for($i=0;$i<count($req);$i++) {
             unset($req[$i]['bn_hash']);
