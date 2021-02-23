@@ -14,7 +14,7 @@ while ($row = mysqli_fetch_assoc($result)) {
 
         $id = $row['id'];
         $region = $row['vc_region'];
-        $region = str_replace('г. Санкт - Петербург и Ленинградская обл.','Тюменская',$region);
+        $region = str_replace('г. Санкт - Петербург и Ленинградская обл.','Ленинградская',$region);
         $region = str_replace('г. Тюмень  |  Тюменская обл.','Тюменская',$region);
         $region = str_replace('г. Севастополь и Республика Крым','Республика Крым',$region);
         $region = str_replace('г. Норильск  |  Красноярский край','Красноярский',$region);
@@ -27,7 +27,7 @@ while ($row = mysqli_fetch_assoc($result)) {
         $region = str_replace('Республика Карачаево-Черкесская','Карачаево-Черкесская',$region);
         $region = str_replace('Республика Карачаево - Черкесская','Карачаево-Черкесская',$region);
         $region = str_replace('Республика Чеченская','Чеченская',$region);
-        $region = str_replace(' - ','-',$region);
+//        $region = str_replace(' - ','-',$region);
         $region = trim(preg_replace('/(край|область|обл\.|АО|-Югра|-Алания|-Чувашия)/','',$region));
         $sql = 'SELECT id,vc_name FROM regions WHERE vc_name LIKE "'.$region.'%" OR vc_sname LIKE "'.$region.'%"';
         $res = mysqli_query($link,$sql);
