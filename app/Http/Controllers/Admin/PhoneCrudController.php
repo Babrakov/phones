@@ -269,11 +269,11 @@ class PhoneCrudController extends CrudController
             'entity'    => 'sex', // the method that defines the relationship in your Model
             'attribute' => 'vc_name', // foreign key attribute that is shown to user
         ]);
-        $this->crud->addColumn([
-            'name' => 'vc_region',
-            'type' => 'text',
-            'label' => "Регион"
-        ]);
+//        $this->crud->addColumn([
+//            'name' => 'vc_region',
+//            'type' => 'text',
+//            'label' => "Регион"
+//        ]);
         $this->crud->addColumn([
             'name' => 'region_id',
             'type' => 'select',
@@ -281,10 +281,17 @@ class PhoneCrudController extends CrudController
             'entity'    => 'region', // the method that defines the relationship in your Model
             'attribute' => 'vc_name', // foreign key attribute that is shown to user
         ]);
+//        $this->crud->addColumn([
+//            'name' => 'vc_city',
+//            'type' => 'text',
+//            'label' => "Город"
+//        ]);
         $this->crud->addColumn([
-            'name' => 'vc_city',
-            'type' => 'text',
-            'label' => "Город"
+            'name' => 'town_id',
+            'type' => 'select',
+            'label' => "Город",
+            'entity'    => 'town', // the method that defines the relationship in your Model
+            'attribute' => 'vc_name', // foreign key attribute that is shown to user
         ]);
         $this->crud->addColumn([
             'name' => 'tx_location',
@@ -308,6 +315,19 @@ class PhoneCrudController extends CrudController
             'entity'    => 'source', // the method that defines the relationship in your Model
             'attribute' => 'vc_name', // foreign key attribute that is shown to user
         ]);
+//        $this->crud->addColumn([
+////            'name' => 'source.dt_rec',
+////            'type' => 'text',
+//            'label' => "Дата записи",
+//
+////            'name'          => 'source',
+//            'key'           => 'dt_rec',
+//            'type'          => 'model_function_attribute',
+////            'function_name' => 'getSourceDate', // the method in your Model
+//            'function_name' => 'getSource', // the method in your Model
+//            'attribute'     => 'dt_rec',
+//
+//        ]);
         $this->crud->addColumn([
             'name' => 'dt_rec',
             'type' => 'date',
@@ -384,11 +404,11 @@ class PhoneCrudController extends CrudController
             'entity'    => 'sex', // the method that defines the relationship in your Model
             'attribute' => 'vc_name', // foreign key attribute that is shown to user
         ]);
-        $this->crud->addField([
-            'name' => 'vc_region',
-            'type' => 'text',
-            'label' => "Регион"
-        ]);
+//        $this->crud->addField([
+//            'name' => 'vc_region',
+//            'type' => 'text',
+//            'label' => "Регион"
+//        ]);
         $this->crud->addField([
             'name' => 'region_id',
             'type' => 'select2',
@@ -396,10 +416,17 @@ class PhoneCrudController extends CrudController
             'entity'    => 'region', // the method that defines the relationship in your Model
             'attribute' => 'vc_name', // foreign key attribute that is shown to user
         ]);
+//        $this->crud->addField([
+//            'name' => 'vc_city',
+//            'type' => 'text',
+//            'label' => "Город"
+//        ]);
         $this->crud->addField([
-            'name' => 'vc_city',
-            'type' => 'text',
-            'label' => "Город"
+            'name' => 'town_id',
+            'type' => 'select2',
+            'label' => "Город",
+            'entity'    => 'town', // the method that defines the relationship in your Model
+            'attribute' => 'vc_name', // foreign key attribute that is shown to user
         ]);
         $this->crud->addField([
             'name' => 'tx_location',
@@ -420,19 +447,20 @@ class PhoneCrudController extends CrudController
             'name' => 'source_id',
             'type' => 'select2',
             'label' => "Источник",
+            'default' => "1",
             'entity'    => 'source', // the method that defines the relationship in your Model
             'attribute' => 'vc_name', // foreign key attribute that is shown to user
         ]);
-        $this->crud->addField([
-            'name' => 'dt_rec',
-            'type' => 'date_picker',
-            'date_picker_options' => [
-                'format' => 'dd.mm.yyyy',
-//                'format' => 'DD.MM.YYYY',
-                'language' => 'ru'
-            ],
-            'label' => "Дата записи"
-        ]);
+//        $this->crud->addField([
+//            'name' => 'dt_rec',
+//            'type' => 'date_picker',
+//            'date_picker_options' => [
+//                'format' => 'dd.mm.yyyy',
+////                'format' => 'DD.MM.YYYY',
+//                'language' => 'ru'
+//            ],
+//            'label' => "Дата записи"
+//        ]);
         $this->crud->addField([
             'name' => 'vc_link',
             'type' => 'url',
@@ -481,13 +509,6 @@ class PhoneCrudController extends CrudController
 
         $hash = hex2bin(md5($this->crud->getRequest()->vc_phone
             .$this->crud->getRequest()->vc_fio
-            .$this->crud->getRequest()->dt_born
-            .$this->crud->getRequest()->sex_id
-            .$this->crud->getRequest()->vc_region
-            .$this->crud->getRequest()->vc_city
-            .$this->crud->getRequest()->tx_location
-            .$this->crud->getRequest()->vc_email
-            .$this->crud->getRequest()->vc_link
         ));
         $id = $this->crud->getRequest()->id;
         $exist = Phone::where('id','<>',$id)->where('bn_hash',$hash)->count();
@@ -510,16 +531,10 @@ class PhoneCrudController extends CrudController
 
         $hash = hex2bin(md5($this->crud->getRequest()->vc_phone
             .$this->crud->getRequest()->vc_fio
-            .$this->crud->getRequest()->dt_born
-            .$this->crud->getRequest()->sex_id
-            .$this->crud->getRequest()->vc_region
-            .$this->crud->getRequest()->vc_city
-            .$this->crud->getRequest()->tx_location
-            .$this->crud->getRequest()->vc_email
-            .$this->crud->getRequest()->vc_link
         ));
 
         $exist = Phone::where('bn_hash',$hash)->count();
+
         if (!$exist) {
             $this->crud->getRequest()->request->add(['bn_hash' => $hash]);
             $response = $this->traitStore();

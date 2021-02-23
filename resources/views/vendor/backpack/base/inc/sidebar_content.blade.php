@@ -25,9 +25,8 @@
     <ul class="nav-dropdown-items">
         <li class='nav-item'><a class='nav-link' href='{{ backpack_url('sex') }}'><i class='nav-icon la la-venus-mars'></i> Полы</a></li>
         <li class='nav-item'><a class='nav-link' href='{{ backpack_url('source') }}'><i class='nav-icon la la-map-marker'></i> Источники</a></li>
+        <li class='nav-item'><a class='nav-link' href='{{ backpack_url('region') }}'><i class='nav-icon la la-map'></i> Регионы</a></li>
+        <li class='nav-item'><a class='nav-link' href='{{ backpack_url('town') }}'><i class='nav-icon la la-city'></i> Нас. пункты</a></li>
     </ul>
 </li>
 {{--@endif--}}
-
-
-<li class='nav-item'><a class='nav-link' href='{{ backpack_url('region') }}'><i class='nav-icon la la-question'></i> Regions</a></li>
