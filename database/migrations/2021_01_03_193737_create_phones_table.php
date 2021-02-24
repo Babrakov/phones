@@ -26,7 +26,7 @@ class CreatePhonesTable extends Migration
             $table->string('vc_link')->nullable();
             $table->integer('source_id')->nullable();
             $table->text('tx_rem')->nullable();
-            $table->binary('bn_hash',16)->nullable();
+            $table->binary('bn_hash')->nullable();
             $table->timestamps();
             $table->softDeletes();
             $table->index('vc_phone', 'ind_phone');
