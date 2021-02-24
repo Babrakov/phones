@@ -24,9 +24,15 @@ class CreatePhonesTable extends Migration
             $table->string('vc_email')->nullable();
             $table->date('dt_rec')->nullable();
             $table->string('vc_link')->nullable();
+            $table->integer('source_id')->nullable();
             $table->text('tx_rem')->nullable();
+            $table->binary('bn_hash',16)->nullable();
             $table->timestamps();
             $table->softDeletes();
+            $table->index('vc_phone', 'ind_phone');
+            $table->index('vc_fio', 'ind_fio');
+            $table->index('dt_born', 'ind_dborn');
+            $table->index('bn_hash', 'ind_hash');
         });
     }
 
