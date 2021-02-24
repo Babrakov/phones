@@ -32,7 +32,7 @@ class CreatePhonesTable extends Migration
             $table->index('vc_phone', 'ind_phone');
             $table->index('vc_fio', 'ind_fio');
             $table->index('dt_born', 'ind_dborn');
-            $table->index('bn_hash', 'ind_hash');
+//            $table->index('bn_hash', 'ind_hash');
         });
     }
 
