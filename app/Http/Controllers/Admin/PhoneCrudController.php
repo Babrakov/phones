@@ -509,6 +509,7 @@ class PhoneCrudController extends CrudController
 
         $hash = hex2bin(md5($this->crud->getRequest()->vc_phone
             .$this->crud->getRequest()->vc_fio
+            .$this->crud->getRequest()->vc_email
         ));
         $id = $this->crud->getRequest()->id;
         $exist = Phone::where('id','<>',$id)->where('bn_hash',$hash)->count();
@@ -531,6 +532,7 @@ class PhoneCrudController extends CrudController
 
         $hash = hex2bin(md5($this->crud->getRequest()->vc_phone
             .$this->crud->getRequest()->vc_fio
+            .$this->crud->getRequest()->vc_email
         ));
 
         $exist = Phone::where('bn_hash',$hash)->count();
