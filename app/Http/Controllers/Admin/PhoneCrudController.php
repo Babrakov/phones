@@ -187,14 +187,18 @@ class PhoneCrudController extends CrudController
 ////                $query;
 ////            }
 //        ]);
-//        $this->crud->addColumn([
-//            'name' => 'vc_email',
-//            'type' => 'email',
-//            'label' => "Email",
-////            'searchLogic' => function ($query, $column, $searchTerm) {
-////                $query;
-////            }
-//        ]);
+        $this->crud->addColumn([
+            'name' => 'vc_email',
+            'type' => 'email',
+            'label' => "Email",
+            'visibleInTable'  => false,
+            'searchLogic' => function ($query, $column, $searchTerm) {
+                $query->orWhere('vc_email', 'like', $searchTerm.'%');
+            }
+//            'searchLogic' => function ($query, $column, $searchTerm) {
+//                $query;
+//            }
+        ]);
 //        $this->crud->addColumn([
 //            'name' => 'vc_link',
 //            'type' => 'url',

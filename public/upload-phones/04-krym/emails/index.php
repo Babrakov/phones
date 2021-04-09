@@ -1,5 +1,5 @@
 <?php
-require_once('../bootstrap.php');
+require_once('../../bootstrap.php');
 
 $table = 'phones';
 $undoFile = 'undo.sql';
@@ -12,12 +12,11 @@ $row = mysqli_fetch_row($result);
 $max = $row[0]+1;
 
 $source = '10';
-//$file = 'file.csv';
-$file = 'file.txt';
+$file = 'input.txt';
 //$file = 'test.csv';
 $handle = fopen($file,'rt');
 
-$str = fgets($handle); // пропускаем 1-ю строку
+//$str = fgets($handle); // пропускаем 1-ю строку
 $counter = 0; // счетчик для буфера запросов
 $i = 0;
 
@@ -30,17 +29,18 @@ while (!feof($handle)) {
     $str = str_replace("'",'',$str);
     $arr = explode("\t",$str);
 //    $arr = explode(";",$str);
-    if (count($arr) < 4) {
+    if (count($arr) < 3) {
         fwrite($badHandle,"Не хватает полей в записи\t".$str."\n");
         continue;
     }
 
-    $name = $arr[0];
+//    $name = $arr[0];
+    $name = '';
     $sex = getSex($name);
-    $adr = explode(',',$arr[3]);
-    $phone = validatePhone(preg_replace('/[^0-9]/', '', $arr[2]));
-    $email = validateEmail($arr[1]);
-    if ($arr[1] && !$email) {
+    $adr = explode(',',$arr[2]);
+    $phone = validatePhone(preg_replace('/[^0-9]/', '', $arr[1]));
+    $email = validateEmail($arr[0]);
+    if ($arr[0] && !$email) {
         fwrite($badHandle,"В поле email ошибка\t".$str."\n");
         continue;
     }
@@ -97,7 +97,7 @@ fclose($badHandle);
 fclose($undoHandle);
 fclose($handle);
 
-require_once('../shutdown.php');
+require_once('../../shutdown.php');
 
 function checkIfNotExist($hash,$dbh,$i,$table)
 {
