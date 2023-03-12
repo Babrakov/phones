@@ -7,6 +7,7 @@ use App\Models\Phone;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 /**
  * Class PhoneCrudController
@@ -22,6 +23,8 @@ class PhoneCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation { update as traitUpdate; }
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
+
+//    protected $searchColumns = ['vc_fio'];
 
     /**
      * Configure the CrudPanel object. Apply settings to all operations.
@@ -48,63 +51,156 @@ class PhoneCrudController extends CrudController
         $totalRows = $raw[0]->rows;
         $filteredRows = $totalRows;
         $startIndex = request()->input('start') ?: 0;
-        // if a search term was present
-        if (request()->input('search') && request()->input('search')['value']) {
-            // filter the results accordingly
-            $this->crud->applySearchTerm(request()->input('search')['value']);
-            // recalculate the number of filtered rows
-            $filteredRows = $this->crud->count();
-        }
-        // start the results according to the datatables pagination
-        if (request()->input('start')) {
-            $this->crud->skip((int) request()->input('start'));
-        }
-        // limit the number of results according to the datatables pagination
+
         if (request()->input('length')) {
-            $this->crud->take((int) request()->input('length'));
+            $length = (request()->input('length')!=='-1') ? request()->input('length') : $totalRows;
         }
-        // overwrite any order set in the setup() method with the datatables order
+
         if (request()->input('order')) {
             $column_number = request()->input('order')[0]['column'];
             $column_direction = request()->input('order')[0]['dir'];
-            $column = $this->crud->findColumnById($column_number);
-            if ($column['tableColumn']) {
-                // clear any past orderBy rules
-                $this->crud->query->getQuery()->orders = null;
-                // apply the current orderBy rules
-                $this->crud->orderByWithPrefix($column['name'], $column_direction);
-            }
-
-            // check for custom order logic in the column definition
-            if (isset($column['orderLogic'])) {
-                $this->crud->customOrderBy($column, $column_direction);
-            }
+        } else {
+            $column_number = 'id';
+            $column_direction = 'DESC';
         }
 
-        // show newest items first, by default (if no order has been set for the primary column)
-        // if there was no order set, this will be the only one
-        // if there was an order set, this will be the last one (after all others were applied)
-        $orderBy = $this->crud->query->getQuery()->orders;
-        $hasOrderByPrimaryKey = false;
-        collect($orderBy)->each(function ($item, $key) use ($hasOrderByPrimaryKey) {
-            if (! isset($item['column'])) {
-                return false;
+        if (request()->input('search') && request()->input('search')['value']) {
+//            if (strlen(request()->input('search')['value']) < 3 ) return;
+            $results = Phone::select('*')
+                ->whereRaw("MATCH(vc_phone, vc_fio, vc_email) AGAINST('+".request()->input('search')['value']."*' IN BOOLEAN MODE)")
+                ->get();
+
+            $filteredRows = $results->count();
+
+            $results = Phone::select('*')
+                ->whereRaw("MATCH(vc_phone, vc_fio, vc_email) AGAINST('+".request()->input('search')['value']."*' IN BOOLEAN MODE)")
+                ->orderBy($column_number, $column_direction)
+                ->offset($startIndex)
+                ->limit($length)
+                ->get();
+        } else {
+            if (request()->input('start')) {
+                $this->crud->skip((int) request()->input('start'));
+            }
+            // limit the number of results according to the datatables pagination
+            if (request()->input('length')) {
+                $this->crud->take((int) request()->input('length'));
+            }
+            // overwrite any order set in the setup() method with the datatables order
+            if (request()->input('order')) {
+                $column_number = request()->input('order')[0]['column'];
+                $column_direction = request()->input('order')[0]['dir'];
+                $column = $this->crud->findColumnById($column_number);
+                if ($column['tableColumn']) {
+                    // clear any past orderBy rules
+                    $this->crud->query->getQuery()->orders = null;
+                    // apply the current orderBy rules
+                    $this->crud->orderByWithPrefix($column['name'], $column_direction);
+                }
+
+                // check for custom order logic in the column definition
+                if (isset($column['orderLogic'])) {
+                    $this->crud->customOrderBy($column, $column_direction);
+                }
             }
 
-            if ($item['column'] == $this->crud->model->getKeyName()) {
-                $hasOrderByPrimaryKey = true;
+            // show newest items first, by default (if no order has been set for the primary column)
+            // if there was no order set, this will be the only one
+            // if there was an order set, this will be the last one (after all others were applied)
+            $orderBy = $this->crud->query->getQuery()->orders;
+            $hasOrderByPrimaryKey = false;
+            collect($orderBy)->each(function ($item, $key) use ($hasOrderByPrimaryKey) {
+                if (! isset($item['column'])) {
+                    return false;
+                }
 
-                return false;
+                if ($item['column'] == $this->crud->model->getKeyName()) {
+                    $hasOrderByPrimaryKey = true;
+
+                    return false;
+                }
+            });
+            if (! $hasOrderByPrimaryKey) {
+                $this->crud->orderByWithPrefix($this->crud->model->getKeyName(), 'DESC');
             }
-        });
-        if (! $hasOrderByPrimaryKey) {
-            $this->crud->orderByWithPrefix($this->crud->model->getKeyName(), 'DESC');
+            $results = $this->crud->getEntries();
+            $filteredRows = $totalRows;
         }
 
-        $entries = $this->crud->getEntries();
-
-        return $this->crud->getEntriesAsJsonForDatatables($entries, $totalRows, $filteredRows, $startIndex);
+        return $this->crud->getEntriesAsJsonForDatatables($results, $totalRows, $filteredRows, $startIndex);
     }
+
+//    public function search()
+//    {
+//        $this->crud->hasAccessOrFail('list');
+//
+//        $this->crud->applyUnappliedFilters();
+//
+////        $totalRows = $this->crud->model->count();
+////        $filteredRows = $this->crud->query->toBase()->getCountForPagination();
+//
+//        $raw = DB::select('EXPLAIN SELECT COUNT(id) FROM `phones`.`phones` USE INDEX (PRIMARY)');
+//        $totalRows = $raw[0]->rows;
+//        $filteredRows = $totalRows;
+//        $startIndex = request()->input('start') ?: 0;
+//        // if a search term was present
+//        if (request()->input('search') && request()->input('search')['value']) {
+//            // filter the results accordingly
+//            $this->crud->applySearchTerm(request()->input('search')['value']);
+//            // recalculate the number of filtered rows
+//            $filteredRows = $this->crud->count();
+//        }
+//        // start the results according to the datatables pagination
+//        if (request()->input('start')) {
+//            $this->crud->skip((int) request()->input('start'));
+//        }
+//        // limit the number of results according to the datatables pagination
+//        if (request()->input('length')) {
+//            $this->crud->take((int) request()->input('length'));
+//        }
+//        // overwrite any order set in the setup() method with the datatables order
+//        if (request()->input('order')) {
+//            $column_number = request()->input('order')[0]['column'];
+//            $column_direction = request()->input('order')[0]['dir'];
+//            $column = $this->crud->findColumnById($column_number);
+//            if ($column['tableColumn']) {
+//                // clear any past orderBy rules
+//                $this->crud->query->getQuery()->orders = null;
+//                // apply the current orderBy rules
+//                $this->crud->orderByWithPrefix($column['name'], $column_direction);
+//            }
+//
+//            // check for custom order logic in the column definition
+//            if (isset($column['orderLogic'])) {
+//                $this->crud->customOrderBy($column, $column_direction);
+//            }
+//        }
+//
+//        // show newest items first, by default (if no order has been set for the primary column)
+//        // if there was no order set, this will be the only one
+//        // if there was an order set, this will be the last one (after all others were applied)
+//        $orderBy = $this->crud->query->getQuery()->orders;
+//        $hasOrderByPrimaryKey = false;
+//        collect($orderBy)->each(function ($item, $key) use ($hasOrderByPrimaryKey) {
+//            if (! isset($item['column'])) {
+//                return false;
+//            }
+//
+//            if ($item['column'] == $this->crud->model->getKeyName()) {
+//                $hasOrderByPrimaryKey = true;
+//
+//                return false;
+//            }
+//        });
+//        if (! $hasOrderByPrimaryKey) {
+//            $this->crud->orderByWithPrefix($this->crud->model->getKeyName(), 'DESC');
+//        }
+//
+////        $this->crud->searchColumns(['vc_phone']);
+//        $entries = $this->crud->getEntries();
+//
+//        return $this->crud->getEntriesAsJsonForDatatables($entries, $totalRows, $filteredRows, $startIndex);
+//    }
 
     /**
      * Define what happens when the List operation is loaded.
@@ -129,28 +225,30 @@ class PhoneCrudController extends CrudController
             'name'  => 'vc_phone',
             'type'  => 'text',
             'label' => 'Телефон',
-            'searchLogic' => function ($query, $column, $searchTerm) {
-                $query->orWhere('vc_phone', 'like', $searchTerm.'%');
-            }
+//            'searchLogic' => function ($query, $column, $searchTerm) {
+//                $query->orWhere('vc_phone', 'like', $searchTerm.'%');
+//            }
         ]);
         $this->crud->addColumn([
             'name'  => 'vc_fio',
             'type'  => 'text',
             'label' => 'Ф.И.О.',
+            'searchable' => false, // make this column non-searchable
 //            'searchLogic' => false,
-            'searchLogic' => function ($query, $column, $searchTerm) {
-                $query->orWhere('vc_fio', 'like', $searchTerm.'%');
-            }
+//            'searchLogic' => function ($query, $column, $searchTerm) {
+//                $query->orWhere('vc_fio', 'like', $searchTerm.'%');
+//            }
         ]);
         $this->crud->addColumn([
             'name'  => 'dt_born',
             'type'  => 'date',
             'label' => 'Дата рождения',
+            'searchable' => false, // make this column non-searchable
 //            'visibleInTable' => false,
 //            'searchLogic' => function ($query, $column, $searchTerm) {
 //                $query;
 //            }
-            'searchLogic' => false
+//            'searchLogic' => false
         ]);
 //        $this->crud->addColumn([
 //            'name' => 'sex_id',
@@ -191,10 +289,11 @@ class PhoneCrudController extends CrudController
             'name' => 'vc_email',
             'type' => 'email',
             'label' => "Email",
+            'searchable' => false,
             'visibleInTable'  => false,
-            'searchLogic' => function ($query, $column, $searchTerm) {
-                $query->orWhere('vc_email', 'like', $searchTerm.'%');
-            }
+//            'searchLogic' => function ($query, $column, $searchTerm) {
+//                $query->orWhere('vc_email', 'like', $searchTerm.'%');
+//            }
 //            'searchLogic' => function ($query, $column, $searchTerm) {
 //                $query;
 //            }
